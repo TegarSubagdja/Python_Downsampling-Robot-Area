@@ -1,49 +1,40 @@
-import numpy as np
+# Main.py
+import cv2
 
-def simplify_grid(small_grid, robot_size):
-    # Temukan posisi robot ('r') dalam grid kecil
-    robot_positions = np.argwhere(small_grid == 'r')
-    if len(robot_positions) == 0:
-        raise ValueError("Tidak ada posisi robot ('r') dalam grid kecil.")
-    
-    # Ambil batas minimum dan maksimum posisi robot
-    min_row, min_col = robot_positions.min(axis=0)
-    max_row, max_col = robot_positions.max(axis=0)
+# Mengimpor modul dari folder 'Modul'
+from Modul import GreenAreaDetector as gad
+from Modul import BoundingBoxCalculator as bbc
 
-    # Ukuran grid baru
-    new_height = small_grid.shape[0] // robot_size[0]
-    new_width = small_grid.shape[1] // robot_size[1]
-    new_grid = np.zeros((new_height, new_width), dtype=int)
+def process_image(image_path):
+    """Proses utama untuk mendeteksi area hijau dan menggambar bounding box"""
+    # Baca gambar
+    image = cv2.imread(image_path)
 
-    # Hitung posisi robot di grid hasil
-    robot_row = min_row // robot_size[0]
-    robot_col = min_col // robot_size[1]
+    # Membuat masker hijau menggunakan fungsi dari GreenAreaDetector
+    mask = gad.create_green_mask(image)
 
-    # Tandai area robot dengan 1
-    new_grid[robot_row, robot_col] = 1
+    # Mengekstrak area hijau menggunakan fungsi dari GreenAreaDetector
+    green_area = gad.extract_green_area(image, mask)
 
-    return new_grid
+    # Mencari kontur
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# Contoh input
-small_grid = np.array([
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 'r', 'r', 0, 0, 0, 0, 0],
- [0, 0, 0, 'r', 'r', 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
- [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    # Menyaring kontur kecil menggunakan fungsi dari BoundingBoxCalculator
+    contours = bbc.filter_small_contours(contours)
 
-])
+    # Menggambar bounding box menggunakan fungsi dari BoundingBoxCalculator
+    bbc.draw_bounding_boxes(image, contours)
 
-robot_size = (2, 2)  # Ukuran robot dalam grid kecil
+    return image
 
-# Transformasi grid
-result_grid = simplify_grid(small_grid, robot_size)
+if __name__ == "__main__":
+    # Path gambar
+    image_path = "Assets/image.png"  # Ganti dengan path gambar Anda
 
-# Print hasil
-print("Grid Disederhanakan:")
-print(result_grid)
+    # Proses gambar dan menggambar bounding box
+    result_image = process_image(image_path)
+
+    # Menampilkan gambar dengan bounding box
+    cv2.imshow("Green Area with Bounding Boxes", result_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
