@@ -2,8 +2,8 @@
 import cv2
 
 # Mengimpor modul dari folder 'Modul'
-from Modul import GreenAreaDetector as gad
-from Modul import BoundingBoxCalculator as bbc
+from Modul.Detect import GreenAreaDetector as gad
+from Modul.Detect import BoundingBoxCalculator as bbc
 
 def process_image(image_path):
     """Proses utama untuk mendeteksi area hijau dan menggambar bounding box"""
