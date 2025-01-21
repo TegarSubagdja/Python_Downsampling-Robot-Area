@@ -1,4 +1,3 @@
-# bounding_box_calculator.py
 import cv2
 
 def calculate_bounding_box(contour):
@@ -15,4 +14,10 @@ def draw_bounding_boxes(image, contours):
     for contour in contours:
         x, y, w, h = calculate_bounding_box(contour)
         print(f"Bounding Box - Lebar: {w}, Tinggi: {h}")
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 3)
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 0), 1)
+
+def get_center_of_bounding_box(contour):
+    """Menghitung titik tengah dari bounding box yang diberikan"""
+    x, y, w, h = calculate_bounding_box(contour)
+    center = (x + w // 2, y + h // 2)
+    return center
