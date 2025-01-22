@@ -7,11 +7,13 @@ class AStar:
         self.grid = grid
         self.rows = len(grid)
         self.cols = len(grid[0])
-        self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+        
+        # Menambahkan arah diagonal (kiri atas, kanan atas, kiri bawah, kanan bawah)
+        self.directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)] 
     
     def heuristic(self, a, b):
         """Menghitung heuristik (jarak Euclidean)."""
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+        return np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
     
     def valid_move(self, x, y):
         """Memastikan langkah valid di dalam grid dan tidak dalam area yang diblokir (nilai 1)."""
@@ -39,7 +41,7 @@ class AStar:
             for direction in self.directions:
                 neighbor = (current[0] + direction[0], current[1] + direction[1])
                 if self.valid_move(neighbor[0], neighbor[1]):
-                    new_cost = current_cost + 1
+                    new_cost = current_cost + (1 if direction[0] == 0 or direction[1] == 0 else np.sqrt(2))
                     if neighbor not in g_costs or new_cost < g_costs[neighbor]:
                         g_costs[neighbor] = new_cost
                         priority = new_cost + self.heuristic(neighbor, goal)
