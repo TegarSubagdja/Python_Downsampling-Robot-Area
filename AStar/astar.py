@@ -1,136 +1,103 @@
-import cv2
-import numpy as np
-import pandas as pd
+class Simpul:
+    """Sebuah kelas simpul untuk A* Pathfinding"""
 
-class Node():
-
-    """A node class for A* Pathfinding"""
-
-    def __init__(self, parent=None, position=None):
-        self.parent = parent
-        self.position = position
+    def __init__(self, induk=None, posisi=None):
+        self.induk = induk
+        self.posisi = posisi
 
         self.g = 0
         self.h = 0
         self.f = 0
 
-    def __eq__(self, other):
-        return self.position == other.position
+    def __eq__(self, lainnya):
+        return self.posisi == lainnya.posisi
 
 
-def astar(maze, start, end):
-    """Returns a list of tuples as a path from the given start to the given end in the given maze"""
+def astar(labirin, awal, akhir):
+    """Mengembalikan daftar tuple sebagai jalur dari titik awal ke titik akhir dalam labirin"""
 
-    # Create start and end node
-    start_node = Node(None, start)
-    start_node.g = start_node.h = start_node.f = 0
-    end_node = Node(None, end)
-    end_node.g = end_node.h = end_node.f = 0
+    # Buat simpul awal dan akhir
+    simpul_awal = Simpul(None, awal)
+    simpul_akhir = Simpul(None, akhir)
 
-    # Initialize both open and closed list
-    open_list = []
-    closed_list = []
+    # Inisialisasi daftar terbuka dan tertutup
+    daftar_terbuka = []
+    daftar_tertutup = []
 
-    # Add the start node
-    open_list.append(start_node)
+    # Tambahkan simpul awal ke daftar terbuka
+    daftar_terbuka.append(simpul_awal)
 
-    # Loop until you find the end
-    while len(open_list) > 0:
+    # Loop sampai menemukan akhir
+    while daftar_terbuka:
+        # Ambil simpul saat ini
+        simpul_saat_ini = daftar_terbuka[0]
+        indeks_saat_ini = 0
+        for indeks, item in enumerate(daftar_terbuka):
+            if item.f < simpul_saat_ini.f:
+                simpul_saat_ini = item
+                indeks_saat_ini = indeks
 
-        # Get the current node
-        current_node = open_list[0]
-        current_index = 0
-        for index, item in enumerate(open_list):
-            if item.f < current_node.f:
-                current_node = item
-                current_index = index
+        # Hapus simpul saat ini dari daftar terbuka, tambahkan ke daftar tertutup
+        daftar_terbuka.pop(indeks_saat_ini)
+        daftar_tertutup.append(simpul_saat_ini)
 
-        # Pop current off open list, add to closed list
-        open_list.pop(current_index)
-        closed_list.append(current_node)
+        # Ditemukan tujuan
+        if simpul_saat_ini == simpul_akhir:
+            jalur = []
+            saat_ini = simpul_saat_ini
+            while saat_ini is not None:
+                jalur.append(saat_ini.posisi)
+                saat_ini = saat_ini.induk
+            return jalur[::-1]  # Kembalikan jalur yang dibalik
 
-        # Found the goal
-        if current_node == end_node:
-            path = []
-            current = current_node
-            while current is not None:
-                path.append(current.position)
-                current = current.parent
-            return path[::-1] # Return reversed path
+        # Hasilkan anak-anak
+        anak_anak = []
+        for posisi_baru in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            # Dapatkan posisi simpul
+            posisi_simpul = (
+                simpul_saat_ini.posisi[0] + posisi_baru[0],
+                simpul_saat_ini.posisi[1] + posisi_baru[1],
+            )
 
-        # Generate children
-        children = []
-        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
-
-            # Get node position
-            node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
-
-            # Make sure within range
-            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (len(maze[len(maze)-1]) -1) or node_position[1] < 0:
+            # Pastikan dalam jangkauan
+            if (
+                posisi_simpul[0] > (len(labirin) - 1)
+                or posisi_simpul[0] < 0
+                or posisi_simpul[1] > (len(labirin[len(labirin) - 1]) - 1)
+                or posisi_simpul[1] < 0
+            ):
                 continue
 
-            # Make sure walkable terrain
-            if maze[node_position[0]][node_position[1]] != 0:
+            # Pastikan terrain dapat dilalui
+            if labirin[posisi_simpul[0]][posisi_simpul[1]] != 0:
                 continue
 
-            # Create new node
-            new_node = Node(current_node, node_position)
+            # Buat simpul baru
+            simpul_baru = Simpul(simpul_saat_ini, posisi_simpul)
 
-            # Append
-            children.append(new_node)
+            # Tambahkan ke anak-anak
+            anak_anak.append(simpul_baru)
 
-        # Loop through children
-        for child in children:
+        # Loop melalui anak-anak
+        for anak in anak_anak:
+            # Anak ada dalam daftar tertutup
+            if anak in daftar_tertutup:
+                continue
 
-            # Child is on the closed list
-            for closed_child in closed_list:
-                if child == closed_child:
-                    continue
+            # Buat nilai f, g, dan h
+            anak.g = simpul_saat_ini.g + 1
+            anak.h = (
+                (anak.posisi[0] - simpul_akhir.posisi[0]) ** 2
+                + (anak.posisi[1] - simpul_akhir.posisi[1]) ** 2
+            )
+            anak.f = anak.g + anak.h
 
-            # Create the f, g, and h values
-            child.g = current_node.g + 1
-            child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
-            child.f = child.g + child.h
+            # Anak sudah ada dalam daftar terbuka
+            if any(
+                simpul_terbuka for simpul_terbuka in daftar_terbuka if anak == simpul_terbuka and anak.g > simpul_terbuka.g
+            ):
+                continue
 
-            # Child is already in the open list
-            for open_node in open_list:
-                if child == open_node and child.g > open_node.g:
-                    continue
-
-            # Add the child to the open list
-            open_list.append(child)
-
-
-def main():
-
-    image = cv2.imread('image.png')
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    _, biner_image = cv2.threshold(gray_image, 150, 255, cv2.THRESH_BINARY)
-
-    map = np.array(biner_image) // 255
-    print(map)
-    # df = pd.DataFrame(map)
-    # print(df)
-
-    maze = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 4, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-
-    start = (2, 2)
-    end = (5, 5)
-
-    path = astar(maze, start, end)
-    print(path)
-    print(maze[2][1])
-
-
-
-if __name__ == '__main__':
-    main()
+            # Tambahkan anak ke daftar terbuka
+            daftar_terbuka.append(anak)
+    return None  # Kembalikan None jika tidak ada jalur yang ditemukan
