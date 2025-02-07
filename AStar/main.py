@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from Astar import astar
+from astar import astar
 import pandas as pd
 from ShapeDetector import DetektorBentuk  # Sesuaikan dengan nama class yang sudah diubah
 
@@ -27,15 +27,19 @@ def utama():
     if jalur:
         print("Jalur ditemukan:", jalur)
 
-        # Tandai jalur pada peta_array (tandai jalur dengan nilai 2)
         for titik in jalur:
-            peta_array[titik[1], titik[0]] = 7  # Tandai jalur (bisa menggunakan nilai apa pun, misalnya 2)
+            peta_array[titik[1], titik[0]] = 7  # Tandai jalur dengan nilai 7
+
+        # Ubah nilai dalam array sesuai permintaan
+        peta_array = np.where(peta_array == 0, '.', peta_array)  # 0 menjadi titik (.)
+        peta_array = np.where(peta_array == '1', '#', peta_array)  # 1 menjadi halangan (#)
+        peta_array = np.where(peta_array == '2', '#', peta_array)  # 2 menjadi halangan (#)
+        peta_array = np.where(peta_array == '7', '@', peta_array)  # 7 menjadi jalur (*)
 
         # Konversi peta_array ke pandas DataFrame untuk visualisasi yang lebih baik
         df = pd.DataFrame(peta_array)
         print("Peta dengan Jalur (direpresentasikan oleh 2):")
         print(df)
-
     else:
         print("Tidak ada jalur yang ditemukan")
 
