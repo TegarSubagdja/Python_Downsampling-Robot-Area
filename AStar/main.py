@@ -3,10 +3,10 @@ import numpy as np
 from astar import astar
 import pandas as pd
 from ShapeDetector import DetektorBentuk  # Sesuaikan dengan nama class yang sudah diubah
-
+from BarrierRasterCoefficient import BRC as br
 def utama():
     # Muat dan proses gambar
-    gambar = cv2.imread('image2.png')
+    gambar = cv2.imread('image.png')
 
     detektor = DetektorBentuk(gambar)
     tengah_hijau = detektor.deteksi_tengah_hijau()
@@ -20,28 +20,34 @@ def utama():
     # Konversi gambar biner ke peta yang dapat dilalui
     peta_array = np.array(gambar_biner) // 255
 
-    # Cari jalur menggunakan algoritma A*
-    jalur = astar(peta_array, tengah_hijau, tengah_merah)
+    brc = br(tengah_hijau, tengah_merah, peta_array)
+
+    print(brc.get_matrix())
+    print("Jumlah ringtangan adalah " , brc.barrierRaster())
+    print("Jumlah ringtangan adalah " , brc.barrierRasterLib())
+
+    # # Cari jalur menggunakan algoritma A*
+    # jalur = astar(peta_array, tengah_hijau, tengah_merah)
 
     # Cetak jalur
-    if jalur:
-        print("Jalur ditemukan:", jalur)
+    # if jalur:
+    #     print("Jalur ditemukan:", jalur)
 
-        for titik in jalur:
-            peta_array[titik[1], titik[0]] = 7  # Tandai jalur dengan nilai 7
+    #     for titik in jalur:
+    #         peta_array[titik[1], titik[0]] = 7  # Tandai jalur dengan nilai 7
 
-        # Ubah nilai dalam array sesuai permintaan
-        peta_array = np.where(peta_array == 0, '.', peta_array)  # 0 menjadi titik (.)
-        peta_array = np.where(peta_array == '1', '#', peta_array)  # 1 menjadi halangan (#)
-        peta_array = np.where(peta_array == '2', '#', peta_array)  # 2 menjadi halangan (#)
-        peta_array = np.where(peta_array == '7', '@', peta_array)  # 7 menjadi jalur (*)
+    #     # Ubah nilai dalam array sesuai permintaan
+    #     peta_array = np.where(peta_array == 0, '.', peta_array)  # 0 menjadi titik (.)
+    #     peta_array = np.where(peta_array == '1', '#', peta_array)  # 1 menjadi halangan (#)
+    #     peta_array = np.where(peta_array == '2', '#', peta_array)  # 2 menjadi halangan (#)
+    #     peta_array = np.where(peta_array == '7', '@', peta_array)  # 7 menjadi jalur (*)
 
-        # Konversi peta_array ke pandas DataFrame untuk visualisasi yang lebih baik
-        df = pd.DataFrame(peta_array)
-        print("Peta dengan Jalur (direpresentasikan oleh 2):")
-        print(df)
-    else:
-        print("Tidak ada jalur yang ditemukan")
+    #     # Konversi peta_array ke pandas DataFrame untuk visualisasi yang lebih baik
+    #     df = pd.DataFrame(peta_array)
+    #     print("Peta dengan Jalur (direpresentasikan oleh 2):")
+    #     print(df)
+    # else:
+    #     print("Tidak ada jalur yang ditemukan")
 
 if __name__ == "__main__":
     utama()
