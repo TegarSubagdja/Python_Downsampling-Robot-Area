@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
 from astar import astar
-import pandas as pd
 from ShapeDetector import DetektorBentuk  # Sesuaikan dengan nama class yang sudah diubah
 from BarrierRasterCoefficient import BRC as br
+from Guideline import Guideline as gl
+
 def utama():
     # Muat dan proses gambar
     gambar = cv2.imread('image.png')
@@ -20,16 +21,15 @@ def utama():
     # Konversi gambar biner ke peta yang dapat dilalui
     peta_array = np.array(gambar_biner) // 255
 
-    brc = br(tengah_hijau, tengah_merah, peta_array)
+    titik_sekarang = (10, 13)
 
-    print(brc.get_matrix())
-    print("Jumlah ringtangan adalah " , brc.barrierRaster())
-    print("Jumlah ringtangan adalah " , brc.barrierRasterLib())
+    print(gl.guidline(tengah_hijau, tengah_merah, titik_sekarang))
+    print(br.barrierRaster(tengah_hijau, tengah_merah, peta_array))
 
     # # Cari jalur menggunakan algoritma A*
     # jalur = astar(peta_array, tengah_hijau, tengah_merah)
 
-    # Cetak jalur
+    # # Cetak jalur
     # if jalur:
     #     print("Jalur ditemukan:", jalur)
 
