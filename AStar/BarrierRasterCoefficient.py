@@ -1,12 +1,16 @@
 class BRC:
     def barrierRaster(awal, akhir, peta):
         jumlah = 0
-        for i in range(awal[1], akhir[1]):
-            for j in range(awal[0], akhir[0]):
+        x1, y1 = awal
+        x2, y2 = akhir
+
+        for i in range(y1, y2):
+            for j in range(x1, x2):
                 if peta[i][j] == 1:
                     jumlah += 1
-        lebar = awal[0] - akhir[0]
-        tinggi = awal[1] - akhir[1]
+                    
+        lebar = x2 - x1
+        tinggi = y2 - y1
         luas = lebar * tinggi
         koeficien = jumlah / luas
         return koeficien
