@@ -13,8 +13,8 @@ def utama():
     detektor = DetektorBentuk(gambar)
     tengah_hijau = detektor.deteksi_tengah_hijau()
     tengah_merah = detektor.deteksi_tengah_merah()
-    print("Titik tengah area hijau:", tengah_hijau)
-    print("Titik tengah area merah:", tengah_merah)
+    # print("Titik tengah area hijau:", tengah_hijau)
+    # print("Titik tengah area merah:", tengah_merah)
 
     gambar_abu = cv2.cvtColor(gambar, cv2.COLOR_BGR2GRAY)
     _, gambar_biner = cv2.threshold(gambar_abu, 180, 255, cv2.THRESH_BINARY_INV)
@@ -22,14 +22,15 @@ def utama():
     # Konversi gambar biner ke peta yang dapat dilalui
     peta_array = np.array(gambar_biner) // 255
 
-    titik_sekarang = (12, 8)
+    # titik_sekarang = (12, 8)
 
-    print(gl.guidline(tengah_hijau, tengah_merah, titik_sekarang))
-    print(br.barrierRaster(tengah_hijau, tengah_merah, peta_array))
+    # print(gl.guidline(tengah_hijau, tengah_merah, titik_sekarang))
+    # print(br.barrierRaster(tengah_hijau, tengah_merah, peta_array))
 
     # Cari jalur menggunakan algoritma A*
     jalur = astar(peta_array, tengah_hijau, tengah_merah)
 
+    return peta_array, jalur
     # Cetak jalur
     if jalur:
         print("Jalur ditemukan:", jalur)
