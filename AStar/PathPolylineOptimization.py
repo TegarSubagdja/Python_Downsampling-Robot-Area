@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 class NodeCut:
     @staticmethod
@@ -57,23 +58,45 @@ class NodeCut:
         return points
     
     @staticmethod
-    def has_obstacle(nodes, peta):
+    def lompatanAman(awal, akhir, peta):
         """Check if any node in the path is an obstacle (1)."""
-        return any(peta[y][x] == 1 for x, y in nodes)
+        nodes = NodeCut.supercover_line(awal, akhir)
+        if(any(peta[y][x] == 1 for x, y in nodes)):
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def is_one_point_move(awal, akhir):
+        x1, y1 = awal
+        x2, y2 = akhir
+        if (math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) <= 1.5):
+            return True
+        else:
+            return False
 
     @staticmethod
     def prunning(jalur, peta):
-        awal = 3
+        awal = 0
+        akhir = 1
         jalur_prunning = [jalur[awal]]
-        for akhir in range(awal, len(jalur)):
-            titikPotong = NodeCut.supercover_line(jalur[awal], jalur[akhir])
-            if NodeCut.has_obstacle(titikPotong, peta):
-                print("Titik Potong untuk awal ", jalur[awal], "akhir ", jalur[akhir], "adalah", titikPotong, "Memotong")
-            else:
-                print("Titik Potong untuk awal ", jalur[awal], "akhir ", jalur[akhir], "adalah", titikPotong)
+        while awal <= len(jalur)-3:
+            while akhir <= len(jalur)-1:
+                if not (NodeCut.lompatanAman(jalur[awal], jalur[akhir], peta)):
+                    print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} tidak aman!")
+                    if (NodeCut.is_one_point_move(jalur[awal], jalur[akhir])):
+                        jalur_prunning.append(jalur[akhir])
+                        awal = akhir
+                        break
+                    else:
+                        jalur_prunning.append(jalur[akhir-1])
+                        awal = akhir - 1
+                        break
+                else:
+                    print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} aman!")
+                    akhir += 1
+        return jalur_prunning
 
-
-        return 1
 
 # Example usage:
 from main import utama
