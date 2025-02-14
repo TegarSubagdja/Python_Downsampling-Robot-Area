@@ -193,10 +193,12 @@ while running:
                     start_pos = np.argwhere(map_grid == 2)[0]  # Mencari koordinat start
                     goal_pos = np.argwhere(map_grid == 3)[0]  # Mencari koordinat goal
 
+                    from cekPergerakan import bresenham
+
                     if start_pos.size == 0 or goal_pos.size == 0:
                         print("Start or Goal is missing!")
                     else:
-                        node = NodeCut.supercover_line(start_pos, goal_pos)
+                        node = bresenham(start_pos, goal_pos)
                         for n in node:
                             map_grid[n[0], n[1]] = 1
 
