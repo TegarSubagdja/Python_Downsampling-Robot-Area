@@ -88,13 +88,18 @@ class NodeCut:
     def prunning(jalur, peta):
         awal = 0
         akhir = 1
+        awal_t = awal
+        akhir_t = akhir
         jalur_prunning = [jalur[awal]]
-        while awal <= len(jalur)-3:
+        while True:
             while akhir <= len(jalur)-1:
                 if not (NodeCut.lompatanAman(jalur[awal], jalur[akhir], peta)):
                     print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} tidak aman!")
                     if (NodeCut.is_45_degree(jalur[awal], jalur[akhir])):
                         akhir += 1
+                        break
+                    elif akhir == len(jalur):
+                        jalur_prunning.append(jalur[akhir])
                         break
                     else:
                         jalur_prunning.append(jalur[akhir-1])
@@ -103,6 +108,11 @@ class NodeCut:
                 else:
                     print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} aman!")
                     akhir += 1
+            if (awal_t == awal and akhir_t == akhir):
+                break
+            awal_t = awal
+            akhir_t = akhir
+        jalur_prunning.append(jalur[len(jalur)-1])
         return jalur_prunning
 
 
