@@ -74,6 +74,15 @@ class NodeCut:
             return True
         else:
             return False
+        
+    def is_45_degree(awal, akhir):
+        x1, y1 = awal
+        x2, y2 = akhir
+        
+        if x2 - x1 == 0:  # Menghindari pembagian dengan nol (garis vertikal)
+            return False
+        slope = (y2 - y1) / (x2 - x1)
+        return slope == 1 or slope == -1
 
     @staticmethod
     def prunning(jalur, peta):
@@ -84,9 +93,8 @@ class NodeCut:
             while akhir <= len(jalur)-1:
                 if not (NodeCut.lompatanAman(jalur[awal], jalur[akhir], peta)):
                     print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} tidak aman!")
-                    if (NodeCut.is_one_point_move(jalur[awal], jalur[akhir])):
-                        jalur_prunning.append(jalur[akhir])
-                        awal = akhir
+                    if (NodeCut.is_45_degree(jalur[awal], jalur[akhir])):
+                        akhir += 1
                         break
                     else:
                         jalur_prunning.append(jalur[akhir-1])
