@@ -3,7 +3,6 @@ import pandas as pd
 import math
 
 class NodeCut:
-    @staticmethod
     def supercover_line(awal, akhir):
         x1, y1 = awal
         x2, y2 = akhir
@@ -57,7 +56,6 @@ class NodeCut:
 
         return points
     
-    @staticmethod
     def lompatanAman(awal, akhir, peta):
         """Check if any node in the path is an obstacle (1)."""
         nodes = NodeCut.supercover_line(awal, akhir)
@@ -66,7 +64,6 @@ class NodeCut:
         else:
             return True
 
-    @staticmethod
     def is_one_point_move(awal, akhir):
         x1, y1 = awal
         x2, y2 = akhir
@@ -84,7 +81,6 @@ class NodeCut:
         slope = (y2 - y1) / (x2 - x1)
         return slope == 1 or slope == -1
 
-    @staticmethod
     def prunning(jalur, peta):
         awal = 0
         akhir = 1
@@ -94,7 +90,7 @@ class NodeCut:
         while True:
             while akhir <= len(jalur)-1:
                 if not (NodeCut.lompatanAman(jalur[awal], jalur[akhir], peta)):
-                    print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} tidak aman!")
+                    # print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} tidak aman!")
                     if (NodeCut.is_45_degree(jalur[awal], jalur[akhir])):
                         akhir += 1
                         break
@@ -106,7 +102,7 @@ class NodeCut:
                         awal = akhir - 1
                         break
                 else:
-                    print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} aman!")
+                    # print(f"Dari awal {jalur[awal]} dan akhir {jalur[akhir]} aman!")
                     akhir += 1
             if (awal_t == awal and akhir_t == akhir):
                 break
@@ -116,32 +112,34 @@ class NodeCut:
         return jalur_prunning
 
 
-# Example usage:
-from main import utama
+# # Example usage:
+# from main import utama
 
-peta, jalur = utama()
+# peta, jalur = utama()
 
-peta_ori = peta
+# peta_ori = peta
 
-# Cetak jalur
-if jalur:
-    print("Jalur ditemukan:", jalur)
+# print(peta_ori)
 
-    for titik in jalur:
-        peta[titik[1], titik[0]] = 7  # Tandai jalur dengan nilai 7
+# # Cetak jalur
+# if jalur:
+#     print("Jalur ditemukan:", jalur)
+
+#     for titik in jalur:
+#         peta[titik[1], titik[0]] = 7  # Tandai jalur dengan nilai 7
     
-    # Ubah nilai dalam array sesuai permintaan
-    peta = np.where(peta == 0, '.', peta)  # 0 menjadi titik (.)
-    peta = np.where(peta == '1', '#', peta)  # 1 menjadi halangan (#)
-    peta = np.where(peta == '2', '#', peta)  # 2 menjadi halangan (#)
-    peta = np.where(peta == '7', '@', peta)  # 7 menjadi jalur (*)
+#     # Ubah nilai dalam array sesuai permintaan
+#     peta = np.where(peta == 0, '.', peta)  # 0 menjadi titik (.)
+#     peta = np.where(peta == '1', '#', peta)  # 1 menjadi halangan (#)
+#     peta = np.where(peta == '2', '#', peta)  # 2 menjadi halangan (#)
+#     peta = np.where(peta == '7', '@', peta)  # 7 menjadi jalur (*)
 
-    # Konversi peta ke pandas DataFrame untuk visualisasi yang lebih baik
-    df = pd.DataFrame(peta)
-    print("Peta dengan Jalur (direpresentasikan oleh 2):")
-    print(df)
-else:
-    print("Tidak ada jalur yang ditemukan")
+#     # Konversi peta ke pandas DataFrame untuk visualisasi yang lebih baik
+#     df = pd.DataFrame(peta)
+#     print("Peta dengan Jalur (direpresentasikan oleh 2):")
+#     print(df)
+# else:
+#     print("Tidak ada jalur yang ditemukan")
 
-print("Jalur sebelumnya ", jalur)
-print("Jalur Setelah Prunning ", NodeCut.prunning(jalur, peta_ori))
+# print("Jalur sebelumnya ", jalur)
+# print("Jalur Setelah Prunning ", NodeCut.prunning(jalur, peta_ori))
